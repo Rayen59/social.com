@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h2>Welcome to the Chat</h2>
+<a href="{{ url_for('logout') }}">Logout</a>
+
+<div id="messages">
+    {% for msg in messages %}
+        <p>{{ msg[1] }}</p>
+    {% endfor %}
+</div>
+
+<input id="input" type="text" placeholder="Enter your message..." />
+<button onclick="sendMessage()">Send</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+<script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.on('message', function(msg) {
+        var messagesDiv = document.getElementById("messages");
+        messagesDiv.innerHTML += "<p>" + msg + "</p>";
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    function sendMessage() {
+        var input = document.getElementById("input");
+        var msg = input.value;
+        socket.send(msg);
+        input.value = '';  // Clear the input after sending
+    }
+</script>
+
+</body>
+</html>
